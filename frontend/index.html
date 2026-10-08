@@ -1,211 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Almighty Taker RealTime Studio — Professional Live Editing</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Almighty Taker Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-<!-- ===== NAVBAR ===== -->
-<nav class="navbar">
-  <div class="logo">
-    <svg viewBox="0 0 32 32" width="28" height="28" fill="none">
-      <rect width="32" height="32" rx="8" fill="url(#lg)"/>
-      <path d="M10 16l4-6 4 6-4 6-4-6z" fill="#fff" opacity=".9"/>
-      <circle cx="22" cy="10" r="2" fill="#00cec9"/>
-      <defs><linearGradient id="lg" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6c5ce7"/><stop offset="1" stop-color="#00cec9"/></linearGradient></defs>
-    </svg>
-    <span>Almighty Taker Studio</span>
-  </div>
-  <div class="nav-links">
-    <a href="#" id="navHome">Home</a>
-    <a href="#" id="navDashboard" style="display:none;">Dashboard</a>
-    <a href="#" id="navAdmin" style="display:none;">Admin</a>
-    <button class="btn-nav" id="navAuthBtn">Get Started</button>
-  </div>
-</nav>
-
-<!-- ===== HERO ===== -->
-<section class="hero" id="heroSection">
-  <h1>Real‑Time AI Studio</h1>
-  <p>Professional live editing platform with coin‑gated streaming, secure authentication, and admin controls. Built for creators who demand power.</p>
-  <div class="hero-badges">
-    <span class="hero-badge">⚡ Real‑Time Processing</span>
-    <span class="hero-badge">🔒 Secure & Private</span>
-    <span class="hero-badge">🎯 Coin Economy</span>
-    <span class="hero-badge">🛡️ Admin Control</span>
-  </div>
-</section>
-
-<!-- ===== FEATURES ===== -->
-<section class="section" id="featuresSection">
-  <div class="container">
-    <h2 class="section-title">Platform Features</h2>
-    <p class="section-subtitle">Everything you need for professional live streaming</p>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🎥</div>
-        <h3>Live Deepfake Cam</h3>
-        <p>Real‑time face swap and style transfer with ultra‑low latency. Go live instantly.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">💰</div>
-        <h3>Coin Economy</h3>
-        <p>Deposit, earn, and spend coins. Full admin control over releases and balances.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔐</div>
-        <h3>Secure Auth</h3>
-        <p>JWT‑based authentication with bcrypt password hashing. Your data stays safe.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📁</div>
-        <h3>File Management</h3>
-        <p>Upload profiles, assets, and references. Cloud storage included.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📊</div>
-        <h3>Admin Dashboard</h3>
-        <p>Full backend control — confirm deposits, manage users, monitor streams.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3>Real‑Time Sync</h3>
-        <p>WebRTC‑ready streaming pipeline. Ready for production use.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== AUTH SECTION ===== -->
-<section class="section auth-section active" id="authSection">
-  <div class="container">
-    <div class="card" id="authCard">
-      <h2 style="margin-bottom:1.5rem; text-align:center;" id="authTitle">🔐 Create Your Account</h2>
-      <div id="authAlert" class="alert" style="display:none;"></div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="email" placeholder="you@example.com" />
-      </div>
-      <div class="form-group" id="usernameGroup">
-        <label>Username</label>
-        <input type="text" id="username" placeholder="AlmightyTaker" />
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="password" placeholder="••••••••" />
-      </div>
-      <button class="btn btn-primary btn-block" id="authBtn">🚀 Create Account</button>
-      <div class="toggle-link">
-        <span id="toggleText">Already have an account?</span> <a id="toggleLink">Log in</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== DASHBOARD SECTION ===== -->
-<section class="section dashboard-section" id="dashboardSection">
-  <div class="container">
-    <div class="card card-wide">
-      <h2 style="margin-bottom:1.5rem;">👤 Dashboard</h2>
-      <div id="dashAlert" class="alert" style="display:none;"></div>
-
-      <div class="balance-display">
-        <div>
-          <p style="color:var(--text-secondary); font-size:.9rem;">Your Balance</p>
-          <p class="balance-amount" id="balanceDisplay">0</p>
+    <nav id="navbar">
+        <div class="logo">
+            <i class="fas fa-bolt"></i>
+            <span>Almighty Taker</span>
         </div>
-        <div style="display:flex; gap:.75rem; flex-wrap:wrap;">
-          <button class="btn btn-accent" id="depositBtn">💰 Deposit Coins</button>
-          <button class="btn btn-primary" id="goLiveBtn">🎥 Go Live</button>
+        <div class="nav-links">
+            <a href="#" id="navHome">Home</a>
+            <a href="#" id="navDashboard" style="display:none;">Dashboard</a>
+            <a href="#" id="navAdmin" style="display:none;">Admin</a>
+            <a href="#" id="navAuthBtn">Get Started</a>
+            <div id="userBadge" class="user-badge" style="display:none;">
+                <i class="fas fa-user-circle"></i>
+                <span id="userName">User</span>
+            </div>
         </div>
-      </div>
+    </nav>
 
-      <h3 style="margin-bottom:1rem;">📁 Upload Media</h3>
-      <div class="upload-zone" id="uploadZone">
-        <div class="upload-placeholder">
-          <p style="font-size:2rem; margin-bottom:.5rem;">📤</p>
-          <p>Drop files here or click to upload</p>
-          <p style="font-size:.8rem; color:var(--text-muted);">Images, videos, models</p>
+    <!-- Hero Section -->
+    <section id="heroSection" class="section active">
+        <div class="hero-content glass-card">
+            <div class="hero-badge">🔥 Live Streaming Studio</div>
+            <h1>Real‑Time AI<br /><span class="gradient-text">Deepfake Streaming</span></h1>
+            <p>Next‑generation live streaming platform with real‑time face processing, coin economy, and full admin control. Go live in seconds.</p>
+            <div class="hero-buttons">
+                <a href="#" id="heroGetStarted" class="btn btn-primary">Get Started Free</a>
+                <a href="#" class="btn btn-outline">View Features</a>
+            </div>
         </div>
-        <img class="preview" id="uploadPreview" />
-      </div>
-      <input type="file" id="fileInput" style="display:none;" accept="image/*,video/*" />
+    </section>
 
-      <div style="margin-top:1.5rem;">
-        <h3 style="margin-bottom:.75rem;">📜 Recent Transactions</h3>
-        <div id="transactionList">
-          <p style="color:var(--text-muted); font-size:.9rem;">No transactions yet.</p>
+    <!-- Auth Section -->
+    <section id="authSection" class="section">
+        <div class="auth-card glass-card">
+            <h2 id="authTitle">🔐 Create Your Account</h2>
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="email" placeholder="you@example.com" required />
+                </div>
+                <div class="form-group" id="usernameGroup">
+                    <label for="username"><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="username" placeholder="Your display name" />
+                </div>
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="password" placeholder="Enter a secure password" required />
+                </div>
+                <div id="authAlert" class="alert"></div>
+                <button type="button" id="authBtn" class="btn btn-primary btn-block">🚀 Create Account</button>
+                <p class="toggle-text">
+                    <span id="toggleText">Already have an account?</span>
+                    <a href="#" id="toggleLink">Log in</a>
+                </p>
+            </form>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- ===== ADMIN SECTION ===== -->
-<section class="section admin-section" id="adminSection">
-  <div class="container">
-    <div class="card card-wide">
-      <h2 style="margin-bottom:1.5rem;">🛡️ Admin Panel</h2>
-      <div id="adminAlert" class="alert" style="display:none;"></div>
+    <!-- Dashboard Section -->
+    <section id="dashboardSection" class="section">
+        <div class="dashboard-grid">
+            <div class="dash-header glass-card">
+                <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                <div class="dash-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-coins"></i>
+                        <div>
+                            <span class="stat-value" id="balanceDisplay">0</span>
+                            <span class="stat-label">Coins</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-wifi"></i>
+                        <div>
+                            <span class="stat-value">0</span>
+                            <span class="stat-label">Streams</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-      <h3 style="margin-bottom:1rem;">⏳ Pending Deposits</h3>
-      <div id="pendingList">
-        <p style="color:var(--text-muted); font-size:.9rem;">No pending deposits.</p>
-      </div>
+            <div class="dash-actions glass-card">
+                <button class="btn btn-accent" id="goLiveBtn">
+                    <i class="fas fa-video"></i> Go Live
+                </button>
+                <button class="btn btn-outline" id="depositBtn">
+                    <i class="fas fa-plus-circle"></i> Deposit
+                </button>
+            </div>
 
-      <div style="margin-top:2rem;">
-        <h3 style="margin-bottom:.75rem;">👥 All Users</h3>
-        <div id="userList">
-          <p style="color:var(--text-muted); font-size:.9rem;">Loading users...</p>
+            <div class="file-upload glass-card">
+                <h3><i class="fas fa-upload"></i> Upload Source Face</h3>
+                <div id="uploadZone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop or click to upload an image</p>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" hidden />
+                <img id="uploadPreview" class="upload-preview" />
+                <div id="dashAlert" class="alert"></div>
+            </div>
+
+            <div class="dash-transactions glass-card">
+                <h3><i class="fas fa-history"></i> Transaction History</h3>
+                <div id="transactionList">
+                    <p style="color:var(--text-muted); font-size:.85rem;">No transactions yet.</p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- ===== DEPOSIT MODAL ===== -->
-<div class="modal-overlay" id="depositModal">
-  <div class="modal">
-    <h2 style="margin-bottom:1rem;">💰 Deposit Coins</h2>
-    <p style="color:var(--text-secondary); margin-bottom:1.5rem;">Minimum deposit: <strong>10 coins</strong></p>
-    <div class="form-group">
-      <label>Amount (coins)</label>
-      <input type="number" id="depositAmount" min="10" value="50" />
-    </div>
-    <div class="alert alert-info" style="margin-bottom:1rem;">
-      Transfer to: <strong>Almighty Taker</strong><br/>
-      Bank: <strong>1234567890</strong><br/>
-      After transfer, request confirmation below.
-    </div>
-    <button class="btn btn-primary btn-block" id="requestDepositBtn">📨 Request Deposit</button>
-    <button class="btn btn-outline btn-block" id="closeDepositModal" style="margin-top:.5rem;">Cancel</button>
-  </div>
-</div>
+    <!-- Admin Section -->
+    <section id="adminSection" class="section">
+        <div class="admin-grid">
+            <div class="admin-pending glass-card">
+                <h3><i class="fas fa-clock"></i> Pending Deposits</h3>
+                <div id="pendingList">
+                    <p style="color:var(--text-muted); font-size:.85rem;">No pending deposits.</p>
+                </div>
+            </div>
+            <div class="admin-users glass-card">
+                <h3><i class="fas fa-users"></i> All Users</h3>
+                <div id="userList"></div>
+            </div>
+            <div id="adminAlert" class="alert"></div>
+        </div>
+    </section>
 
-<!-- ===== LIVECAM MODAL ===== -->
-<div class="modal-overlay" id="liveModal">
-  <div class="modal">
-    <h2 style="margin-bottom:1rem;">🎥 Live Stream</h2>
-    <div id="liveContent">
-      <p style="color:var(--text-secondary); margin-bottom:1rem;">Starting your stream...</p>
-      <div id="livePreview" style="background:#000; border-radius:8px; min-height:200px; display:flex; align-items:center; justify-content:center; color:var(--text-muted);">
-        📡 Connecting...
-      </div>
-      <button class="btn btn-danger btn-block" id="stopLiveBtn" style="margin-top:1rem;">⏹️ Stop Stream</button>
+    <!-- Live Modal -->
+    <div id="liveModal" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3><i class="fas fa-broadcast-tower"></i> Live Stream</h3>
+            </div>
+            <div class="modal-body">
+                <div id="livePreview">
+                    <video id="localVideo" autoplay playsinline muted></video>
+                    <div id="processingStatus">⏳ Connecting...</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="stopLiveBtn">
+                    <i class="fas fa-stop-circle"></i> End Stream
+                </button>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-<!-- ===== FOOTER ===== -->
-<footer>
-  <p>🔥 <strong>Almighty Taker RealTime Studio</strong> — Developed by <strong>Almighty Taker</strong></p>
-  <p style="margin-top:.5rem;">© 2026 All rights reserved. Unauthorized reproduction prohibited.</p>
-</footer>
-https://cdn.socket.io/4.7.4/socket.io.min.js
-<script src="script.js"></script>
+    <!-- Deposit Modal -->
+    <div id="depositModal" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3><i class="fas fa-coins"></i> Request Deposit</h3>
+                <button id="closeDepositModal" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Enter coin amount (minimum 10):</p>
+                <input type="number" id="depositAmount" min="10" placeholder="e.g. 100" />
+                <button class="btn btn-accent" id="requestDepositBtn">Request</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
