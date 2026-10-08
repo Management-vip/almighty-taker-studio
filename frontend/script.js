@@ -1,55 +1,54 @@
-// ===== CONFIGURATION — UPDATE THESE WITH YOUR RENDER URLS =====
-const NODE_API = 'https://almighty-taker-studio-api.onrender.com';   // Your Node.js backend
-const PYTHON_WS = 'https://almighty-taker-py-server.onrender.com'; // Your Python processing server
+// ===== API URLs =====
+const NODE_API = 'https://almighty-taker-studio-api.onrender.com';
+const PYTHON_WS = 'https://almighty-taker-py-server.onrender.com';
 
 // ===== STATE =====
 let token = localStorage.getItem('token');
 let currentUser = null;
 let isLoginMode = false;
-let localStream = null;          // Camera stream
-let socket = null;              // Socket.IO client to Python server
-let isProcessing = false;       // True only when Python confirms processing active
-let processingActive = false;   // Same as above
-let streamSessionId = null;     // ID for current stream session
+let localStream = null;
+let socket = null;
+let streamSessionId = null;
+let isProcessing = false;
+let frameInterval = null;
 
 // ===== DOM REFS =====
-const heroSection = document.getElementById('heroSection');
-const featuresSection = document.getElementById('featuresSection');
-const authSection = document.getElementById('authSection');
-const dashboardSection = document.getElementById('dashboardSection');
-const adminSection = document.getElementById('adminSection');
-const navDashboard = document.getElementById('navDashboard');
-const navAdmin = document.getElementById('navAdmin');
-const navAuthBtn = document.getElementById('navAuthBtn');
-const navHome = document.getElementById('navHome');
-const authTitle = document.getElementById('authTitle');
-const authBtn = document.getElementById('authBtn');
-const toggleLink = document.getElementById('toggleLink');
-const toggleText = document.getElementById('toggleText');
-const authAlert = document.getElementById('authAlert');
-const dashAlert = document.getElementById('dashAlert');
-const adminAlert = document.getElementById('adminAlert');
-const emailInput = document.getElementById('email');
-const usernameInput = document.getElementById('username');
-const passwordInput = document.getElementById('password');
-const usernameGroup = document.getElementById('usernameGroup');
-const balanceDisplay = document.getElementById('balanceDisplay');
-const depositBtn = document.getElementById('depositBtn');
-const goLiveBtn = document.getElementById('goLiveBtn');
-const depositModal = document.getElementById('depositModal');
-const depositAmount = document.getElementById('depositAmount');
-const requestDepositBtn = document.getElementById('requestDepositBtn');
-const closeDepositModal = document.getElementById('closeDepositModal');
-const liveModal = document.getElementById('liveModal');
-const stopLiveBtn = document.getElementById('stopLiveBtn');
-const uploadZone = document.getElementById('uploadZone');
-const fileInput = document.getElementById('fileInput');
-const uploadPreview = document.getElementById('uploadPreview');
-const transactionList = document.getElementById('transactionList');
-const pendingList = document.getElementById('pendingList');
-const userList = document.getElementById('userList');
-const livePreview = document.getElementById('livePreview');
-const liveContent = document.getElementById('liveContent');
+const $ = (id) => document.getElementById(id);
+const heroSection = $('heroSection');
+const authSection = $('authSection');
+const dashboardSection = $('dashboardSection');
+const adminSection = $('adminSection');
+const navDashboard = $('navDashboard');
+const navAdmin = $('navAdmin');
+const navAuthBtn = $('navAuthBtn');
+const navHome = $('navHome');
+const authTitle = $('authTitle');
+const authBtn = $('authBtn');
+const toggleLink = $('toggleLink');
+const toggleText = $('toggleText');
+const authAlert = $('authAlert');
+const dashAlert = $('dashAlert');
+const adminAlert = $('adminAlert');
+const emailInput = $('email');
+const usernameInput = $('username');
+const passwordInput = $('password');
+const usernameGroup = $('usernameGroup');
+const balanceDisplay = $('balanceDisplay');
+const depositBtn = $('depositBtn');
+const goLiveBtn = $('goLiveBtn');
+const depositModal = $('depositModal');
+const depositAmount = $('depositAmount');
+const requestDepositBtn = $('requestDepositBtn');
+const closeDepositModal = $('closeDepositModal');
+const liveModal = $('liveModal');
+const stopLiveBtn = $('stopLiveBtn');
+const uploadZone = $('uploadZone');
+const fileInput = $('fileInput');
+const uploadPreview = $('uploadPreview');
+const transactionList = $('transactionList');
+const pendingList = $('pendingList');
+const userList = $('userList');
+const livePreview = $('livePreview');
 
 // ===== UTILITY =====
 function showAlert(el, msg, type = 'error') {
@@ -59,50 +58,26 @@ function showAlert(el, msg, type = 'error') {
 }
 function hideAlert(el) { el.style.display = 'none'; }
 
-// ===== NAVIGATION =====
+// ===== SECTION CONTROL =====
 function showSection(section) {
-  [heroSection, featuresSection, authSection, dashboardSection, adminSection].forEach(s => {
-    if (s) {
-      if (s === featuresSection) {
-        s.style.display = 'none';
-      } else {
-        s.classList.remove('active');
-      }
-    }
-  });
-  if (section) {
-    if (section === featuresSection) {
-      section.style.display = 'block';
-    } else {
-      section.classList.add('active');
-    }
-  }
+  [heroSection, authSection, dashboardSection, adminSection].forEach(s => s.classList.remove('active'));
+  if (section) section.classList.add('active');
 }
 
-navHome.addEventListener('click', (e) => {
-  e.preventDefault();
-  showSection(heroSection);
-  featuresSection.style.display = 'block';
-});
+// ===== NAV =====
+navHome.onclick = e => { e.preventDefault(); showSection(heroSection); };
+navDashboard.onclick = e => { e.preventDefault(); showSection(dashboardSection); };
+navAdmin.onclick = e => { e.preventDefault(); showSection(adminSection); loadPending(); loadUsers(); };
+navAuthBtn.onclick = () => showSection(authSection);
 
-navDashboard.addEventListener('click', (e) => {
+// ===== HERO GET STARTED =====
+$('heroGetStarted').onclick = e => {
   e.preventDefault();
-  showSection(dashboardSection);
-});
-
-navAdmin.addEventListener('click', (e) => {
-  e.preventDefault();
-  showSection(adminSection);
-  loadPending();
-  loadUsers();
-});
-
-navAuthBtn.addEventListener('click', () => {
   showSection(authSection);
-});
+};
 
-// ===== TOGGLE AUTH MODE =====
-toggleLink.addEventListener('click', () => {
+// ===== TOGGLE LOGIN / REGISTER =====
+toggleLink.onclick = () => {
   isLoginMode = !isLoginMode;
   if (isLoginMode) {
     authTitle.textContent = '🔑 Log In';
@@ -118,22 +93,15 @@ toggleLink.addEventListener('click', () => {
     usernameGroup.style.display = 'block';
   }
   hideAlert(authAlert);
-});
+};
 
-// ===== AUTH — with token expiry handling =====
-authBtn.addEventListener('click', async () => {
+// ===== AUTH =====
+authBtn.onclick = async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
   const username = usernameInput.value.trim();
-
-  if (!email || !password) {
-    showAlert(authAlert, 'Please fill in all required fields.');
-    return;
-  }
-  if (!isLoginMode && !username) {
-    showAlert(authAlert, 'Username is required for registration.');
-    return;
-  }
+  if (!email || !password) return showAlert(authAlert, 'Fill all required fields.');
+  if (!isLoginMode && !username) return showAlert(authAlert, 'Username required.');
 
   const endpoint = isLoginMode ? '/api/login' : '/api/register';
   const body = isLoginMode ? { email, password } : { email, username, password };
@@ -145,110 +113,91 @@ authBtn.addEventListener('click', async () => {
       body: JSON.stringify(body)
     });
     const data = await res.json();
-    if (!res.ok) {
-      showAlert(authAlert, data.error || 'Authentication failed.');
-      return;
-    }
+    if (!res.ok) return showAlert(authAlert, data.error || 'Auth failed.');
     token = data.token;
     localStorage.setItem('token', token);
     currentUser = data.user;
     onAuthSuccess();
-  } catch (err) {
-    showAlert(authAlert, 'Network error. Is the Node backend running?');
+  } catch {
+    showAlert(authAlert, 'Network error. Is backend running?');
   }
-});
+};
 
 function onAuthSuccess() {
   hideAlert(authAlert);
   showSection(dashboardSection);
   navDashboard.style.display = 'inline';
   navAuthBtn.textContent = 'Dashboard';
-  if (currentUser && currentUser.is_admin) {
-    navAdmin.style.display = 'inline';
-  }
+  if (currentUser?.is_admin) navAdmin.style.display = 'inline';
   loadBalance();
   loadTransactions();
 }
 
-// ===== TOKEN EXPIRY HANDLER =====
-async function authenticatedFetch(url, options = {}) {
-  // Attach token
+// ===== TOKEN-AWARE FETCH =====
+async function authFetch(url, options = {}) {
   if (!options.headers) options.headers = {};
   options.headers['Authorization'] = `Bearer ${token}`;
-  
-  try {
-    const res = await fetch(url, options);
-    
-    // If 401, token expired
-    if (res.status === 401) {
-      localStorage.removeItem('token');
-      token = null;
-      currentUser = null;
-      showSection(authSection);
-      navDashboard.style.display = 'none';
-      navAdmin.style.display = 'none';
-      navAuthBtn.textContent = 'Get Started';
-      showAlert(authAlert, 'Session expired. Please log in again.', 'error');
-      return null;
-    }
-    
-    return res;
-  } catch (err) {
-    throw err;
+  const res = await fetch(url, options);
+  if (res.status === 401) {
+    localStorage.removeItem('token');
+    token = null;
+    currentUser = null;
+    showSection(authSection);
+    navDashboard.style.display = 'none';
+    navAdmin.style.display = 'none';
+    navAuthBtn.textContent = 'Get Started';
+    showAlert(authAlert, 'Session expired. Please log in again.');
+    return null;
   }
+  return res;
 }
 
 // ===== BALANCE =====
 async function loadBalance() {
   try {
-    const res = await authenticatedFetch(`${NODE_API}/api/balance`);
+    const res = await authFetch(`${NODE_API}/api/balance`);
     if (!res) return;
     const data = await res.json();
     balanceDisplay.textContent = data.coins || 0;
-  } catch (e) {
-    console.error('Balance load failed');
+  } catch {
+    console.error('balance fail');
   }
 }
 
 // ===== TRANSACTIONS =====
 async function loadTransactions() {
   try {
-    const res = await authenticatedFetch(`${NODE_API}/api/transactions`);
+    const res = await authFetch(`${NODE_API}/api/transactions`);
     if (!res) return;
     const data = await res.json();
-    if (data.length === 0) {
-      transactionList.innerHTML = '<p style="color:var(--text-muted); font-size:.9rem;">No transactions yet.</p>';
+    if (!data || data.length === 0) {
+      transactionList.innerHTML =
+        '<p style="color:var(--text-muted);font-size:.85rem;">No transactions yet.</p>';
       return;
     }
-    transactionList.innerHTML = data.map(tx => `
-      <div style="display:flex; justify-content:space-between; padding:.5rem 0; border-bottom:1px solid var(--border);">
-        <span>${tx.amount} coins</span>
-        <span class="status-${tx.status}">${tx.status}</span>
-        <span style="color:var(--text-muted); font-size:.8rem;">${new Date(tx.created_at).toLocaleDateString()}</span>
-      </div>
-    `).join('');
-  } catch (e) {
-    transactionList.innerHTML = '<p style="color:var(--text-muted); font-size:.9rem;">Failed to load.</p>';
+    transactionList.innerHTML = data
+      .map(
+        tx => `<div><span>${tx.amount} coins</span> <span class="status-${tx.status}">${
+          tx.status
+        }</span> <span style="color:var(--text-muted);font-size:.75rem;">${new Date(
+          tx.created_at
+        ).toLocaleDateString()}</span></div>`
+      )
+      .join('');
+  } catch {
+    transactionList.innerHTML =
+      '<p style="color:var(--text-muted);">Failed to load.</p>';
   }
 }
 
-// ===== DEPOSIT — with error handling =====
-depositBtn.addEventListener('click', () => {
-  depositModal.classList.add('active');
-});
-
-closeDepositModal.addEventListener('click', () => {
-  depositModal.classList.remove('active');
-});
-
-requestDepositBtn.addEventListener('click', async () => {
+// ===== DEPOSIT =====
+depositBtn.onclick = () => depositModal.classList.add('active');
+closeDepositModal.onclick = () => depositModal.classList.remove('active');
+requestDepositBtn.onclick = async () => {
   const amount = parseInt(depositAmount.value);
-  if (!amount || amount < 10) {
-    alert('Minimum 10 coins.');
-    return;
-  }
+  if (!amount || amount < 10) return alert('Min 10 coins.');
   try {
-    const res = await authenticatedFetch(`${NODE_API}/api/deposit/request`, {
+    const res = await authFetch(`${NODE_API}/api/deposit/request`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount })
@@ -256,302 +205,232 @@ requestDepositBtn.addEventListener('click', async () => {
     if (!res) return;
     const data = await res.json();
     if (res.ok) {
-      alert(`✅ Deposit requested!\n\nTransfer ${amount} coins to:\nBank: 1234567890\nName: Almighty Taker\n\nAdmin will confirm shortly.`);
+      alert(
+        '✅ Deposit requested!\n\nTransfer to:\nBank: 1234567890\nName: Almighty Taker'
+      );
       depositModal.classList.remove('active');
       loadTransactions();
-    } else {
-      alert(data.error || 'Deposit request failed.');
-    }
-  } catch (e) {
-    alert('Network error. Is the Node backend running?');
+    } else alert(data.error);
+  } catch {
+    alert('Network error.');
   }
-});
+};
 
-// ===== UPLOAD — with error handling =====
-uploadZone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', async (e) => {
+// ===== UPLOAD =====
+uploadZone.onclick = () => fileInput.click();
+fileInput.onchange = async e => {
   const file = e.target.files[0];
   if (!file) return;
-  
-  // Preview
   const reader = new FileReader();
-  reader.onload = (ev) => {
+  reader.onload = ev => {
     uploadPreview.src = ev.target.result;
-    uploadZone.classList.add('has-file');
+    uploadPreview.style.display = 'block';
   };
   reader.readAsDataURL(file);
 
-  // Upload to Node backend
   const formData = new FormData();
   formData.append('file', file);
   try {
-    const res = await authenticatedFetch(`${NODE_API}/api/upload`, {
+    const res = await authFetch(`${NODE_API}/api/upload`, {
       method: 'POST',
       body: formData
     });
     if (!res) return;
     const data = await res.json();
-    if (res.ok) {
-      showAlert(dashAlert, '✅ File uploaded successfully!', 'success');
-    } else {
-      showAlert(dashAlert, data.error || 'Upload failed.');
-    }
-  } catch (e) {
-    showAlert(dashAlert, 'Upload network error. Is the Node backend running?');
+    if (res.ok) showAlert(dashAlert, '✅ File uploaded!', 'success');
+    else showAlert(dashAlert, data.error || 'Upload failed.');
+  } catch {
+    showAlert(dashAlert, 'Upload error.');
   }
-});
+};
 
-// ===== GO LIVE — REAL CAMERA + SOCKET.IO TO PYTHON =====
-goLiveBtn.addEventListener('click', async () => {
-  // 1. Check coin balance via Node backend
+// ===== GO LIVE =====
+goLiveBtn.onclick = async () => {
   try {
-    const res = await authenticatedFetch(`${NODE_API}/api/stream/start`, {
+    const res = await authFetch(`${NODE_API}/api/stream/start`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
     });
     if (!res) return;
     const data = await res.json();
-    if (!res.ok) {
-      showAlert(dashAlert, data.error || 'Cannot start stream.');
-      return;
-    }
-    streamSessionId = data.session_id || 'live-' + Date.now();
-  } catch (e) {
-    showAlert(dashAlert, 'Network error checking balance. Is the Node backend running?');
-    return;
+    if (!res.ok) return showAlert(dashAlert, data.error);
+    streamSessionId = data.session_id;
+  } catch {
+    return showAlert(dashAlert, 'Network error.');
   }
 
-  // 2. Request camera access
   try {
     localStream = await navigator.mediaDevices.getUserMedia({
-      video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30 } },
+      video: { width: { ideal: 640 }, height: { ideal: 480 } },
       audio: false
     });
   } catch (err) {
-    showAlert(dashAlert, `Camera access denied: ${err.message}. Allow camera permissions.`);
-    // Refund coins
-    await authenticatedFetch(`${NODE_API}/api/stream/fail`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+    showAlert(dashAlert, `Camera error: ${err.message}`);
+    authFetch(`${NODE_API}/api/stream/fail`, {
+      method: 'POST'
     }).catch(() => {});
     return;
   }
 
-  // 3. Connect to Python processing server via Socket.IO
   liveModal.classList.add('active');
-  livePreview.innerHTML = `
-    <div style="position:relative;">
-      <video id="localVideo" autoplay playsinline muted style="width:100%; max-height:400px; border-radius:8px;"></video>
-      <div id="processingStatus" style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,.6); color:#ffa502; padding:4px 12px; border-radius:20px; font-size:.75rem;">
-        ⏳ Connecting to processing server...
-      </div>
-    </div>
-  `;
-  
+  livePreview.innerHTML = `<div style="position:relative;"><video id="localVideo" autoplay playsinline muted style="width:100%;border-radius:16px;max-height:360px;object-fit:cover;"></video><div id="processingStatus" style="position:absolute;top:12px;left:12px;background:rgba(0,0,0,.5);padding:4px 12px;border-radius:20px;font-size:.75rem;">⏳ Connecting...</div></div>`;
   const video = document.getElementById('localVideo');
   video.srcObject = localStream;
-  
-  // 4. Initialize Socket.IO connection to Python server
   connectProcessingSocket();
-  
   loadBalance();
-});
+};
 
-// ===== SOCKET.IO CONNECTION TO PYTHON PROCESSING SERVER =====
+// ===== SOCKET.IO =====
 function connectProcessingSocket() {
-  // Close any existing connection
   if (socket) {
     socket.disconnect();
     socket = null;
   }
-  
-  // Connect using Socket.IO client
   socket = io(PYTHON_WS, {
     transports: ['websocket', 'polling'],
     reconnection: true,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 2000
+    reconnectionAttempts: 5
   });
-  
+
   socket.on('connect', () => {
-    console.log('✅ Connected to processing server');
-    updateProcessingStatus('🟢 Processing server connected', '#00cec9');
-    
-    // Register this session
-    socket.emit('register_session', {
-      session_id: streamSessionId,
-      token: token
-    });
-    
-    // Start sending frames from camera
+    updateStatus('🟢 Processing server connected', '#00cec9');
+    socket.emit('register_session', { session_id: streamSessionId, token });
     startSendingFrames();
   });
-  
-  socket.on('connect_error', (error) => {
-    console.error('❌ Processing server connection error:', error.message);
-    updateProcessingStatus('❌ Processing server unavailable — camera only', '#ff6b6b');
-    // Camera still works, just no processing
-  });
-  
-  socket.on('disconnect', (reason) => {
-    console.log('Disconnected from processing server:', reason);
-    updateProcessingStatus('⏳ Reconnecting to processing server...', '#ffa502');
-  });
-  
-  socket.on('processing_active', (data) => {
+
+  socket.on('connect_error', () =>
+    updateStatus('❌ Processing unavailable — camera only', '#ef4444')
+  );
+
+  socket.on('processing_active', () => {
     isProcessing = true;
-    processingActive = true;
-    updateProcessingStatus('🔴 Processing active — deepfake running', '#00cec9');
+    updateStatus('🔴 Deepfake active', '#00cec9');
   });
-  
-  socket.on('processing_inactive', (data) => {
+
+  socket.on('processing_inactive', () => {
     isProcessing = false;
-    processingActive = false;
-    updateProcessingStatus('⚠️ Processing paused', '#ffa502');
+    updateStatus('⚠️ Paused', '#f59e0b');
   });
-  
-  socket.on('processed_frame', (data) => {
-    // Display processed frame
-    let processedImg = document.getElementById('processedFrame');
-    if (!processedImg) {
-      processedImg = document.createElement('img');
-      processedImg.id = 'processedFrame';
-      processedImg.style.width = '100%';
-      processedImg.style.maxHeight = '400px';
-      processedImg.style.borderRadius = '8px';
-      processedImg.style.display = 'none';
-      livePreview.appendChild(processedImg);
+
+  socket.on('processed_frame', data => {
+    let img = document.getElementById('processedFrame');
+    if (!img) {
+      img = document.createElement('img');
+      img.id = 'processedFrame';
+      Object.assign(img.style, {
+        width: '100%',
+        borderRadius: '16px',
+        maxHeight: '360px',
+        objectFit: 'cover',
+        display: 'none'
+      });
+      livePreview.appendChild(img);
     }
-    
     if (data && data.frame) {
-      processedImg.src = 'data:image/jpeg;base64,' + data.frame;
-      processedImg.style.display = 'block';
-      // Hide raw video when processed frame available
-      const rawVideo = document.getElementById('localVideo');
-      if (rawVideo) rawVideo.style.display = 'none';
+      img.src = 'data:image/jpeg;base64,' + data.frame;
+      img.style.display = 'block';
+      const rawVid = document.getElementById('localVideo');
+      if (rawVid) rawVid.style.display = 'none';
     }
-  });
-  
-  socket.on('error', (data) => {
-    console.error('Processing server error:', data.message);
-    updateProcessingStatus('❌ Processing error: ' + (data.message || 'unknown'), '#ff6b6b');
   });
 }
 
-// ===== SEND CAMERA FRAMES TO PYTHON SERVER =====
-let frameInterval = null;
-
 function startSendingFrames() {
-  if (frameInterval) {
-    clearInterval(frameInterval);
-    frameInterval = null;
-  }
-  
+  clearInterval(frameInterval);
   const video = document.getElementById('localVideo');
   if (!video) return;
-  
-  // Create a canvas to capture frames
   const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
   canvas.width = 640;
   canvas.height = 480;
-  
+  const ctx = canvas.getContext('2d');
   frameInterval = setInterval(() => {
     if (!socket || !socket.connected) return;
     if (!localStream || !localStream.active) {
       stopSendingFrames();
       return;
     }
-    
-    // Draw current video frame to canvas
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Convert to blob and send
-    canvas.toBlob((blob) => {
-      if (blob && socket && socket.connected) {
-        // Send as binary via Socket.IO
-        socket.emit('video_frame', blob);
-      }
+    ctx.drawImage(video, 0, 0);
+    canvas.toBlob(blob => {
+      if (blob && socket && socket.connected) socket.emit('video_frame', blob);
     }, 'image/jpeg', 0.8);
-  }, 100); // ~10 FPS to reduce bandwidth
+  }, 100);
 }
 
 function stopSendingFrames() {
-  if (frameInterval) {
-    clearInterval(frameInterval);
-    frameInterval = null;
+  clearInterval(frameInterval);
+}
+
+function updateStatus(text, color) {
+  const el = document.getElementById('processingStatus');
+  if (el) {
+    el.textContent = text;
+    el.style.color = color;
   }
 }
 
-function updateProcessingStatus(text, color) {
-  const status = document.getElementById('processingStatus');
-  if (status) {
-    status.textContent = text;
-    status.style.color = color || '#ffa502';
-  }
-}
-
-// ===== STOP STREAM — SAFE DISCONNECT =====
-stopLiveBtn.addEventListener('click', () => {
-  // 1. Stop sending frames
+// ===== STOP STREAM =====
+stopLiveBtn.onclick = () => {
   stopSendingFrames();
-  
-  // 2. Notify Python server
   if (socket && socket.connected) {
     socket.emit('stop_processing', { session_id: streamSessionId });
     socket.disconnect();
     socket = null;
   }
-  
-  // 3. Stop camera safely
   if (localStream) {
-    localStream.getTracks().forEach(track => {
-      track.stop();
-    });
+    localStream.getTracks().forEach(t => t.stop());
     localStream = null;
   }
-  
-  // 4. Notify Node backend
-  authenticatedFetch(`${NODE_API}/api/stream/stop`, {
+  authFetch(`${NODE_API}/api/stream/stop`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ session_id: streamSessionId })
-  }).catch(() => {}).finally(() => {
-    streamSessionId = null;
-    isProcessing = false;
-    processingActive = false;
-    liveModal.classList.remove('active');
-    loadBalance();
-  });
-});
+  })
+    .catch(() => {})
+    .finally(() => {
+      streamSessionId = null;
+      isProcessing = false;
+      liveModal.classList.remove('active');
+      loadBalance();
+    });
+};
 
 // ===== ADMIN =====
 async function loadPending() {
   try {
-    const res = await authenticatedFetch(`${NODE_API}/api/admin/pending`);
+    const res = await authFetch(`${NODE_API}/api/admin/pending`);
     if (!res) return;
     const data = await res.json();
     if (!data || data.length === 0) {
-      pendingList.innerHTML = '<p style="color:var(--text-muted); font-size:.9rem;">No pending deposits.</p>';
+      pendingList.innerHTML =
+        '<p style="color:var(--text-muted);font-size:.85rem;">No pending deposits.</p>';
       return;
     }
-    pendingList.innerHTML = data.map(tx => `
-      <div style="display:flex; justify-content:space-between; align-items:center; padding:.75rem 0; border-bottom:1px solid var(--border);">
-        <div>
-          <strong>${tx.users?.username || 'Unknown'}</strong> — ${tx.amount} coins
-          <p style="font-size:.8rem; color:var(--text-muted);">${new Date(tx.created_at).toLocaleString()}</p>
-        </div>
-        <button class="btn btn-accent btn-sm" onclick="confirmTx('${tx.id}')">✅ Confirm</button>
-      </div>
-    `).join('');
-  } catch (e) {
-    pendingList.innerHTML = '<p style="color:var(--text-muted);">Failed to load.</p>';
+    pendingList.innerHTML = data
+      .map(
+        tx => `<div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px solid var(--border);">
+          <div>
+            <strong>${tx.users?.username || 'Unknown'}</strong> — ${
+          tx.amount
+        } coins
+            <p style="font-size:.8rem;color:var(--text-muted);">${new Date(
+              tx.created_at
+            ).toLocaleString()}</p>
+          </div>
+          <button class="btn btn-accent btn-sm" onclick="confirmTxHelper('${
+            tx.id
+          }')">✅ Confirm</button>
+        </div>`
+      )
+      .join('');
+  } catch {
+    pendingList.innerHTML =
+      '<p style="color:var(--text-muted);">Failed.</p>';
   }
 }
 
 async function loadUsers() {
   try {
-    const res = await authenticatedFetch(`${NODE_API}/api/admin/users`);
+    const res = await authFetch(`${NODE_API}/api/admin/users`);
     if (!res) return;
     const data = await res.json();
     if (!data || data.length === 0) {
@@ -561,17 +440,25 @@ async function loadUsers() {
     userList.innerHTML = `<table class="admin-table">
       <thead><tr><th>User</th><th>Email</th><th>Coins</th><th>Joined</th></tr></thead>
       <tbody>
-        ${data.map(u => `<tr><td>${u.username}</td><td>${u.email}</td><td>${u.coins}</td><td>${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('')}
+        ${data
+          .map(
+            u =>
+              `<tr><td>${u.username}</td><td>${u.email}</td><td>${u.coins}</td><td>${new Date(
+                u.created_at
+              ).toLocaleDateString()}</td></tr>`
+          )
+          .join('')}
       </tbody>
     </table>`;
-  } catch (e) {
-    userList.innerHTML = '<p style="color:var(--text-muted);">Failed to load.</p>';
+  } catch {
+    userList.innerHTML = '<p style="color:var(--text-muted);">Failed.</p>';
   }
 }
 
-async function confirmTx(id) {
+// Helper window function so inline onclick works for admin confirm buttons
+window.confirmTxHelper = async id => {
   try {
-    const res = await authenticatedFetch(`${NODE_API}/api/admin/confirm`, {
+    const res = await authFetch(`${NODE_API}/api/admin/confirm`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ transaction_id: id })
@@ -580,29 +467,29 @@ async function confirmTx(id) {
     const data = await res.json();
     if (res.ok) {
       loadPending();
-      showAlert(adminAlert, '✅ Deposit confirmed!', 'success');
-    } else {
-      showAlert(adminAlert, data.error || 'Confirmation failed.', 'error');
-    }
-  } catch (e) {
-    showAlert(adminAlert, 'Network error.', 'error');
+      showAlert(adminAlert, '✅ Confirmed!', 'success');
+    } else showAlert(adminAlert, data.error);
+  } catch {
+    showAlert(adminAlert, 'Error.');
   }
-}
+};
 
 // ===== AUTO LOGIN CHECK =====
 if (token) {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
-    const expiry = payload.exp * 1000;
-    if (Date.now() > expiry) {
-      // Token expired
+    if (Date.now() > payload.exp * 1000) {
       localStorage.removeItem('token');
       token = null;
     } else {
-      currentUser = { id: payload.id, email: payload.email, is_admin: payload.is_admin };
+      currentUser = {
+        id: payload.id,
+        email: payload.email,
+        is_admin: payload.is_admin
+      };
       onAuthSuccess();
     }
-  } catch (e) {
+  } catch {
     localStorage.removeItem('token');
     token = null;
   }
